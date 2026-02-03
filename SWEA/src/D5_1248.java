@@ -1,4 +1,6 @@
 import java.util.Scanner;
+import java.util.Set;
+import java.util.HashSet;
 
 public class D5_1248 {
 	public static void main(String[] args) {
@@ -10,49 +12,26 @@ public class D5_1248 {
 				final int A = sc.nextInt(); // 정점 1
 				final int B = sc.nextInt(); // 정점 2
 				
-				// 전략 : 이진트리이므로 배열로 입력 받음. number(1~N)가 인덱스, 값이 위치(1 ~ 2^V-1)
-				// 그런데 V가 최대 10000이므로 2^10000은 말이 안 됨..
-				// tree[num] = positionNumber; // num 노드가 positionNumber 위치에 있다 -> 배정을 하는 행위 자체가 연결까지 하는 것과 같음
-				int[] tree = new int[V+1];
-				
+				// 전략 : 자식 노드를 정의하고 parent 숫자 및 자신의 level(root=1에서 자식일 수록 1씩 커짐) 저장
+				//       또한 모든 노드를 Set에 담아서 iterate 가능하도록
+				Set<TreeNode> nodes = new HashSet<>();
 				for (int i=0; i<E; i++) {
-					int parent = sc.nextInt();
-					int child = sc.nextInt();
+					int numParent = sc.nextInt();
+					int numChild = sc.nextInt();
 					
-					if (tree[parent] == 0 && tree[child] == 0) {
-						tree[parent] = 1;
-						tree[child] = 2;
-					} else if (tree[parent] == 0) {
-						tree[parent] = getParentPosition(tree[child]);
-					} else if (tree[child] == 0) {
-						if (tree[getLeftChildPosition(tree[parent])] == 0) {
-							tree[child] = getLeftChildPosition(tree[parent]);
-						} else {
-							tree[child] = getRightChildPosition(tree[parent]);
-						}
-					}
+					
 				}
-				
-				for (int i=1; i<=V; i++)
-					System.out.print(tree[i]+" ");
-				
-				break;
 			}
 		}
 	}
+}
+
+class TreeNode {
+	int parent = -1;
+	int level = -1;
 	
-	public static int getParentPosition(int childPosition) {
-		// left or right
-		// left : 2 4 6 ... even
-		// right : 3 5 7 ... odd
-		return childPosition / 2;
-	}
-	
-	public static int getLeftChildPosition(int parentPosition) {
-		return parentPosition*2;
-	}
-	
-	public static int getRightChildPosition(int parentPosition) {
-		return parentPosition*2+1;
+	TreeNode(int parent, int level) {
+		this.parent = parent;
+		this.level = level;
 	}
 }
