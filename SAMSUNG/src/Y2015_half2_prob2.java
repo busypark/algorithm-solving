@@ -93,6 +93,7 @@ class Map {
 				red.r += dR;
 				red.c += dC;
 				
+				if ()
 			}	
 		}
 	}
