@@ -54,23 +54,96 @@ public class D4_1249 {
 				cases.add(new ArrayDeque<Pos>());
 				cases.get(0).add(new Pos(0, 0));
 				
-				searchPath(0);
+				minTotal = Integer.MAX_VALUE;
+				searchPath(0); // 로직은 괜찮은 것 같은데, 재귀함수라서 StackOverFlow 뜨는 것 같음. 반복문으로 바꿔야..
 				
 				int answer = minTotal;
 				System.out.println("#"+t+" "+answer);
 				
-				break;
+				//break;
 			}
 		}
 	}
 	
 	static void searchPath(int cost) {
-		// 언제 이 재귀가 멈추나?
+		printPath();
 		
-		if (cases.get(cases.size()-1).size() == 0) { // no more candidates. switch to another way
-			
+		if (cases.size() == 0) { // 아무 Step도 없으면 종료
+			System.out.println("[ No More Step -> return ]");
 			return;
 		}
+		
+		if (cases.get(cases.size()-1).size() == 0) { // 마지막 Step에 후보가 더 없으므로 해당 Step은 지우고 그 직전의 Head도 pop
+			cases.remove(cases.size()-1); // 해당 Step 지움
+			System.out.println("[ this step is dead-end. removing.. ]");
+			if (0 < cases.size()) { // S 말고 더 남았으면 이미 탐색한 후보 1개 지우고 다시 재귀. S뿐이면 이대로 재귀 종료
+				Pos head = cases.get(cases.size()-1).pop();
+				System.out.println("[ removing the head. searching another head.. ]");
+				searchPath(cost - map[head.r][head.c]);
+			}
+		} else { // 마지막 Step에 후보가 더 있으므로 그 중 Head에 대해 4방으로 살피되 기존 경로(기존 Step들의 Head) 피해서 다음 Step 추가
+			Pos head = cases.get(cases.size()-1).peekFirst(); // 후보들 중 선택된 좌표
+			if (head.r == N-1 && head.c == N-1) { // 선택된 좌표가 곧 종점(G)일 경우, minTotal 갱신 후 재귀
+				cases.get(cases.size()-1).pop(); // G는 제거
+				minTotal = Math.min(minTotal, cost); // minTotal 갱신
+				System.out.println("[Reached to G]");
+				System.out.println("  currentTotal = " + cost);
+				System.out.println("  minTotal = "+minTotal);
+				searchPath(cost);
+			} else { // 선택된 좌표가 종점(G) 아닌 경우, 4방인데 기존 경로 중복 안 되도록 Step 추가 후 재귀 (cost 누적)
+				Deque<Pos> newStep = new ArrayDeque<>();
+				
+				Pos up = newCandidate(head.r - 1, head.c);
+				if (up != null) newStep.add(up);
+
+				Pos down = newCandidate(head.r + 1, head.c);
+				if (down != null) newStep.add(down);
+
+				Pos left = newCandidate(head.r, head.c - 1);
+				if (left != null) newStep.add(left);
+
+				Pos right = newCandidate(head.r, head.c + 1);
+				if (right!= null) newStep.add(right);
+				
+				cases.add(newStep);
+				searchPath(cost + map[head.r][head.c]);
+			}
+		}
+	}
+	
+	static void printPath() {
+		int[][] pathMap = new int[N][N];
+		for (int i=0; i<cases.size(); i++) {
+			Pos p = cases.get(i).peekFirst();
+			if (p != null)
+				pathMap[p.r][p.c] = i+1;
+		}
+
+		System.out.println("--------------");
+		for (int r=0; r<N; r++) {
+			for (int c=0; c<N; c++) {
+				System.out.printf("%2d ", pathMap[r][c]);
+			}
+			System.out.println();
+		}
+	}
+
+	static Pos newCandidate(int r, int c) {
+		if (isValid(r, c)) {
+			boolean passed = false;
+			for (int i=0; i<cases.size(); i++) {
+				Pos p = cases.get(i).peekFirst();
+				if (p.r == r && p.c == c) {
+					passed = true;
+					break;
+				}
+			}
+			
+			if (!passed) {
+				return new Pos(r, c);
+			}
+		}
+		return null;
 	}
 	
 	static boolean isValid(int r, int c) {
