@@ -1,6 +1,6 @@
 import java.util.Scanner;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 // https://swexpertacademy.com/main/code/problem/problemDetail.do?contestProbId=AWXRQm6qfL0DFAUo&
 
@@ -9,132 +9,202 @@ public class SW_5656 {
 		try (Scanner sc = new Scanner(System.in)) {
 			final int T = sc.nextInt();
 			for (int t=1; t<=T; t++) {
+				// input N ,W, H
 				final int N = sc.nextInt(); // 구슬을 쏘는 횟수 (1 <= N <= 4)
 				final int W = sc.nextInt(); // width (2 <= W <= 12)
 				final int H = sc.nextInt(); // height (2 <= H <= 15)
 				
-				final List<List<Integer>> map = new ArrayList<>(); // List 대신 배열 쓰고 싶었지만..
-				final int[][] tempMap = new int[H][W]; // 주의! H가 깊이이므로 행임
-				for (int h=0; h<H; h++) {
-					for (int w=0; w<W; w++) {
-						tempMap[h][w] = sc.nextInt();
-					}
-				}
-				
-				// transform tempMap to map
-				for (int w=0; w<W; w++) {
-					List<Integer> column = new ArrayList<>();
-					for (int h=H-1; 0<=h; h--) {
-						if (tempMap[h][w] == 0) break; // column의 상단은 0으로 채워져 있으므로 더이상 추가할 필요가 없음
-						
-						column.add(tempMap[h][w]); // head = bottom, tail = top
-					}
-					
-					map.add(column);
-				}
-				
-				// Start Simulation
-				for (int n=0; n<N; n++) {
-					printMap(map, W);
-					
-					// choose the column which has maximum top
-					// 각 열에 점수를 매김. 높이 * boom 번호의 총합으로. 그게 가장 높은 열로 maxC 선정
-					// 이유? 그냥 높이에 더 큰 값 있으면 좋으니까
-					
-					int maxC = -1;
-					for (int c=0; c<W; c++) // initialize maxC -> 아무 것도 없는 열에 쏠 필요는 없음
-						if (map.get(c).size() > 0)
-							maxC = c;
-					if (maxC == -1) break; // 모든 열에 아무 것도 없으면 시뮬레이션 더 할 필요도 없음
-					
-					int maxFormula = getValue(map.get(maxC));
+				// input map : row = h, column = c
+				final int[][] map = new int[H][W];
+				for (int h=H-1; 0<=h; h--) { // h=높이를 의미하므로 거꾸로 입력받는 것 반영
 					for (int c=0; c<W; c++) {
-						if (map.get(c).size() > 0) {
-							int formula = getValue(map.get(c));
-							if (maxFormula < formula) {
-								maxC = c;
-								maxFormula = getValue(map.get(maxC));
+						map[h][c] = sc.nextInt();
+					}
+				}
+				
+				// dijkstra
+				int minSize = Integer.MAX_VALUE;
+				List<Status> unvisited = new LinkedList<>();
+				Status startingStatus = new Status(W, H);
+				startingStatus.copyMap(map);
+				unvisited.add(startingStatus);
+				while (!unvisited.isEmpty()) {
+					//System.out.println("                                                                       [ loop ]");
+					
+					// choose a status such that the count is minimum
+					unvisited.sort((s1, s2) -> (s1.count - s2.count));
+					Status visitHere = unvisited.get(0);
+					unvisited.remove(0);
+					
+					// check if it's Nth (invalid from N)
+					if (visitHere.loop > N)
+						continue;
+					
+					// update minSize
+					minSize = Math.min(minSize, visitHere.count);
+					
+					// extract possible cases(status)
+					for (int c=0; c<W; c++) {						
+						// possible case : there exists any block 
+						if (0 < visitHere.map[0][c]) {
+							Status next = new Status(W, H);
+							next.loop = visitHere.loop + 1;
+							next.copyMap(visitHere.map);
+							
+							// search for the target h
+							int h;
+							for (h=0; h<H; h++) {
+								if (next.map[h][c] == 0) {
+									break;
+								}
+							}
+							h--; // 천장에 도달했거나 빈칸을 만났으므로 하나 빼야 top과 같음
+							
+							printMap(" [before boom] c="+c+" ", next.map, H, W);
+							
+							// boom
+							boom(next.map, h, c, H, W);
+
+							printMap(" [after boom]", next.map, H, W);
+							
+							// pull down with gravity
+							pullDown(next.map, H, W);
+							
+							printMap(" [after pull-down", next.map, H, W);
+							
+							// check if there's an overlap
+							Status overlap = null;
+							for (int i=0; i<unvisited.size(); i++) {
+								boolean same = true;
+								for (int checkH=0; checkH<H && same; checkH++) {
+									for (int checkC=0; checkC<W && same; checkC++) {
+										if (unvisited.get(i).map[checkH][checkC] != next.map[checkH][checkC]) {
+											same = false;
+										}
+									}
+								}
+								
+								if (same) {
+									overlap = unvisited.get(i);
+									break;
+								}
+							}
+							
+							// update count and accumulatedCount
+							if (overlap == null) { // 중복이 없으면 next를 수정하고 등록
+								next.updateCount();
+								next.count = Math.min(next.count, visitHere.count);
+								unvisited.add(next);
+							} else { // 중복이 있으면 next는 무시하고 overlap을 수정
+								overlap.updateCount();
+								overlap.loop = Math.min(overlap.loop, next.loop);
+								overlap.count = Math.min(overlap.count, visitHere.count);
 							}
 						}
 					}
-					
-					
-					/* 기존 maxC 찾기 (그냥 가장 위의 boom 기준)
-					for (int c=1; c<W; c++) {
-						if (map.get(c).size() == 0) continue;
-						
-						int top = map.get(c).get(map.get(c).size()-1);
-						if (map.get(maxC).get(map.get(maxC).size()-1) < top) {
-							maxC = c;
-						}
-					}
-					*/
-					
-					// boom (해당 열은 boomMagnitude만큼 pop, 좌우 열은 높이가 충족되는 것만 1번씩 pop)
-					// pop이 아니라 removeLast였고, removeLast가 아니라 중간에 있는 걸 골라서 remove해야 함
-					// 해당 열은 좌우 열 하고 난 다음에 해야 함
-					int boomMagnitude = map.get(maxC).get(map.get(maxC).size()-1);
-					System.out.println("[boomMagnitude = "+boomMagnitude+"]");
-					
-					for (int i=1; i<=boomMagnitude-1; i++) {
-						int c;
-						// boom left columns
-						c = maxC - i;
-						if (isValid(c, W) && map.get(maxC).size() <= map.get(c).size()) {
-							map.get(c).remove(map.get(maxC).size()-1);
-						}
-						
-						// boom right columns
-						c = maxC + i;
-						if (isValid(c, W) && map.get(maxC).size() <= map.get(c).size()) {
-							System.out.println("[boom right : idx="+(map.get(maxC).size()-1)+"]");
-							map.get(c).remove(map.get(maxC).size()-1);
-						}
-					}
-					
-					// boom the very column
-					// 해당 열은 removeLast해도 됨. 어차피 가장 위의 아이템이므로
-					for (int i=0; i<boomMagnitude; i++)
-						if (0 < map.get(maxC).size())
-							map.get(maxC).remove(map.get(maxC).size()-1);
 				}
-				
 
-				printMap(map, W);
-				
-				// answer = sum of the lengths of the columns
-				int answer = 0;
-				for (int c=0; c<W; c++) {
-					answer += map.get(c).size();
-					//System.out.println("size of column["+c+"] = "+map.get(c).size());
-				}
-				
-				System.out.println("#"+t+" "+answer);
+				System.out.println("#"+t+" "+minSize);
 			}
 		}
 	}
 	
-	public static boolean isValid(int c, int W) {
-		return (0<=c && c<W);
-	}
-	
-	public static int getValue(List<Integer> column) {
-		int result = 0;
-		for (int h=0; h<column.size(); h++) {
-			result += (h+1) * column.get(h) * column.get(h);
+	public static void boom(int[][] map, int h, int c, int H, int W) {
+		if (map[h][c] == 0) return;
+		int boomMagnitude = map[h][c];
+		map[h][c] = 0; // boom that point
+		for (int i=1; i<boomMagnitude; i++) {
+			if (isValid(h-i, c, H, W)) boom(map, h-i, c, H, W); // down
+			if (isValid(h+i, c, H, W)) boom(map, h+i, c, H, W); // up
+			if (isValid(h, c-i, H, W)) boom(map, h, c-i, H, W); // left
+			if (isValid(h, c+i, H, W)) boom(map, h, c+i, H, W); // right			
 		}
-		
-		return result;
 	}
 	
-	public static void printMap(List<List<Integer>> map, int W) {
-		System.out.println("---------------- print, horizontally! ----------------");
+	public static void pullDown(int[][] map, int H, int W) {
 		for (int c=0; c<W; c++) {
-			System.out.print("column["+c+"] : ");
-			for (int i=0; i<map.get(c).size(); i++) {
-				System.out.print(" "+map.get(c).get(i));
+			for (int h=0; h<H; h++) {
+				if (map[h][c] == 0) { // need to pull down all things above
+					int search = h+1;
+					for (; search<H; search++) {
+						if (map[search][c] != 0)
+							break; // found something to pull down
+					}
+					
+					if (search < H) {
+						map[h][c] = map[search][c];
+						map[search][c] = 0;
+					}
+				}
+			}
+		}
+	}
+	
+	public static boolean isValid(int h, int c, int H, int W) {
+		return (0<=h && h<H && 0<=c && c<W);
+	}
+	
+	public static void printMap(String msg, int[][] map, int H, int W) {
+		if (true) return;
+		System.out.println("--------------"+ msg +"---------------");
+		for (int h=H-1; 0<=h; h--) {
+			for (int c=0; c<W; c++) {
+				if (map[h][c] == 0)
+					System.out.print(" .");
+				else 
+					System.out.print(" "+map[h][c]);
 			}
 			System.out.println();
 		}
 	}
 }
+
+class Status {
+	int W, H;
+	int[][] map;
+	int count;
+	int loop;
+	//int accumulatedCount;
+	
+	Status(int W, int H) {
+		this.W = W;
+		this.H = H;
+		this.map = new int[H][W];
+		this.count = 0;
+		this.loop = 0;
+		//this.accumulatedCount = Integer.MAX_VALUE;
+	}
+	
+	void copyMap(int[][] map) {
+		this.count = 0;
+		for (int h=0; h<H; h++) {
+			for (int c=0; c<W; c++) {
+				this.map[h][c] = map[h][c];
+				if (map[h][c] != 0)
+					this.count++;
+			}
+		}
+	}
+	
+	void updateCount() {
+		this.count = 0;
+		for (int h=0; h<H; h++) {
+			for (int c=0; c<W; c++) {
+				if (map[h][c] != 0)
+					this.count++;
+			}
+		}
+	}
+}
+
+class Block {
+	int c, h;
+	int boomMagnitude;
+	
+	Block(int c, int h, int boomMagnitude) {
+		this.c = c;
+		this.h = h;
+		this.boomMagnitude = boomMagnitude;
+	}
+}
+
