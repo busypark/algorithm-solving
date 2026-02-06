@@ -33,7 +33,7 @@ public class D4_1251 {
 				int idx = 0;
 				for (int i=0; i<N; i++) {
 					for (int j=i+1; j<N; j++) {
-						Link theLink = new Link(idx, Link.calculateCost(links[i], Links[j], E));
+						Link theLink = new Link(idx, Link.calculateCost(links[i], links[j], E));
 					}
 				}
 				

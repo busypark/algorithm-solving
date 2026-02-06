@@ -10,14 +10,14 @@ public class D4_1868 {
 	static int[][] map = null; // map[r][c] == 0(empty), 1(border), 2(mine)
 
 	static int count;
-	static Set<Point> zeroPoints, borderPoints;
+	static Set<Point_D4_1868> zeroPoint_D4_1868s, borderPoint_D4_1868s;
 	
 	public static void main(String[] args) {		
 		final int T = sc.nextInt();
 		for (int t=1; t<=T; t++) {
 			N = sc.nextInt();
-			zeroPoints = new HashSet<Point>();
-			borderPoints = new HashSet<Point>();
+			zeroPoint_D4_1868s = new HashSet<Point_D4_1868>();
+			borderPoint_D4_1868s = new HashSet<Point_D4_1868>();
 			count = N*N;
 
 			sc.nextLine();
@@ -30,7 +30,7 @@ public class D4_1868 {
 						count--;
 					} else {
 						if (map[r][c] == 0) {
-							zeroPoints.add(new Point(r, c));
+							zeroPoint_D4_1868s.add(new Point_D4_1868(r, c));
 						}
 					}
 				}
@@ -38,17 +38,17 @@ public class D4_1868 {
 
 			// at this time, count == N*N - #mine == (basement)
 			int answer = 0;
-			while (!zeroPoints.isEmpty()) {
-				Point anyZeroPoint = zeroPoints.iterator().next();
-				zeroClick(anyZeroPoint.r, anyZeroPoint.c);
+			while (!zeroPoint_D4_1868s.isEmpty()) {
+				Point_D4_1868 anyZeroPoint_D4_1868 = zeroPoint_D4_1868s.iterator().next();
+				zeroClick(anyZeroPoint_D4_1868.r, anyZeroPoint_D4_1868.c);
 				answer++;
 			}
 			
-			// at this time, zeroPoints is empty
+			// at this time, zeroPoint_D4_1868s is empty
 			// answer == minimum #click for killing all zeros and their borders
-			// borderPoints has border points not killed by zeroClick
+			// borderPoint_D4_1868s has border Point_D4_1868s not killed by zeroClick
 			
-			answer += borderPoints.size();
+			answer += borderPoint_D4_1868s.size();
 
 			System.out.println("#"+t+" "+answer);
 		}
@@ -57,9 +57,9 @@ public class D4_1868 {
 	static void zeroClick(int r, int c) {
 		if (!isValid(r, c) || map[r][c] != 0) return;
 		
-		Point p = new Point(r, c);
-		if (zeroPoints.contains(p))
-			zeroPoints.remove(p);
+		Point_D4_1868 p = new Point_D4_1868(r, c);
+		if (zeroPoint_D4_1868s.contains(p))
+			zeroPoint_D4_1868s.remove(p);
 		
 		for (int dr=-1; dr<=1; dr++) {
 			for (int dc=-1; dc<=1; dc++) {
@@ -68,12 +68,12 @@ public class D4_1868 {
 				
 				if (!isValid(tr, tc) || (tr == r && tc == c)) continue;
 				
-				Point tp = new Point(tr, tc);
-				if (map[tr][tc] == 0 && zeroPoints.contains(tp)) {
+				Point_D4_1868 tp = new Point_D4_1868(tr, tc);
+				if (map[tr][tc] == 0 && zeroPoint_D4_1868s.contains(tp)) {
 					zeroClick(tr, tc); 
 				} else {
-					if (borderPoints.contains(tp))
-						borderPoints.remove(tp);
+					if (borderPoint_D4_1868s.contains(tp))
+						borderPoint_D4_1868s.remove(tp);
 				}
 			}
 		}
@@ -88,15 +88,15 @@ public class D4_1868 {
 				if (isValid(tr, tc) && map[tr][tc] != 2) {
 					map[tr][tc] = 1;
 					
-					Point borderPoint = new Point(tr, tc);
-					zeroPoints.remove(borderPoint);
-					borderPoints.add(borderPoint);
+					Point_D4_1868 borderPoint_D4_1868 = new Point_D4_1868(tr, tc);
+					zeroPoint_D4_1868s.remove(borderPoint_D4_1868);
+					borderPoint_D4_1868s.add(borderPoint_D4_1868);
 				}
 			}
 		}
 		
 		map[r][c] = 2;
-		borderPoints.remove(new Point(r, c));
+		borderPoint_D4_1868s.remove(new Point_D4_1868(r, c));
 	}
 	
 	static boolean isValid(int r, int c) {
@@ -104,10 +104,10 @@ public class D4_1868 {
 	}
 }
 
-class Point {
+class Point_D4_1868 {
 	int r, c;
 	
-	Point(int r, int c) {
+	Point_D4_1868(int r, int c) {
 		this.r = r;
 		this.c = c;
 	}
@@ -119,7 +119,7 @@ class Point {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Point p) {
+		if (obj instanceof Point_D4_1868 p) {
 			return (p.r == this.r) && (p.c == this.c);
 		}
 		
