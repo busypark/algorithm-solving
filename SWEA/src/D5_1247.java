@@ -7,12 +7,12 @@ public class D5_1247 {
 			for (int t=1; t<=T; t++) {
 				final int N = sc.nextInt(); // 2<=N<=10
 				
-				final Position company = new Position(sc.nextInt(), sc.nextInt());
-				final Position house = new Position(sc.nextInt(), sc.nextInt());
+				final Position_D5_1247 company = new Position_D5_1247(sc.nextInt(), sc.nextInt());
+				final Position_D5_1247 house = new Position_D5_1247(sc.nextInt(), sc.nextInt());
 				
-				final Position[] customers = new Position[N];
+				final Position_D5_1247[] customers = new Position_D5_1247[N];
 				for (int i=0; i<N; i++) {
-					customers[i] = new Position(sc.nextInt(), sc.nextInt());
+					customers[i] = new Position_D5_1247(sc.nextInt(), sc.nextInt());
 				}
 				
 				// 전략 : customers에 대한 인덱스 배열(0, 1, ..., N-1)에 대한 가능한 모든 순열(N!가지)을 순회하여 minimum distance 계산
@@ -21,10 +21,10 @@ public class D5_1247 {
 				
 				int minDistance = Integer.MAX_VALUE;
 				do {
-					int currentDistance = Position.getDistance(company, customers[idxArr[0]])
-										+ Position.getDistance(customers[idxArr[N-1]], house);
+					int currentDistance = Position_D5_1247.getDistance(company, customers[idxArr[0]])
+										+ Position_D5_1247.getDistance(customers[idxArr[N-1]], house);
 					for (int i=0; i<N-1; i++) {
-						currentDistance += Position.getDistance(customers[idxArr[i]], customers[idxArr[i+1]]);
+						currentDistance += Position_D5_1247.getDistance(customers[idxArr[i]], customers[idxArr[i+1]]);
 					}
 					
 					minDistance = Math.min(minDistance, currentDistance);
@@ -64,14 +64,14 @@ public class D5_1247 {
 	}
 }
 
-class Position {
+class Position_D5_1247 {
 	int r, c;
-	Position(int r, int c) {
+	Position_D5_1247(int r, int c) {
 		this.r = r;
 		this.c = c;
 	}
 	
-	static int getDistance(Position p1, Position p2) {
+	static int getDistance(Position_D5_1247 p1, Position_D5_1247 p2) {
 		return Math.abs(p1.r - p2.r) + Math.abs(p1.c - p2.c);
 	}
 }
