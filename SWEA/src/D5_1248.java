@@ -12,22 +12,22 @@ public class D5_1248 {
 				
 				// 전략 : 자식 노드를 정의하고 parent 숫자 및 자신의 level(root=1에서 자식일 수록 1씩 커짐. 처음엔 root=1이지만 나중에는 더 낮아질 수도) 저장
 				// 맹점 : 연결할 때 자손들의 level을 모두 reset해야 함
-				TreeNode[] nodes = new TreeNode[V+1];
-				TreeNode nodeA = null;
-				TreeNode nodeB = null;
+				TreeNode_D5_1248[] nodes = new TreeNode_D5_1248[V+1];
+				TreeNode_D5_1248 nodeA = null;
+				TreeNode_D5_1248 nodeB = null;
 				
 				for (int i=0; i<E; i++) {
 					int numParent = sc.nextInt();
 					int numChild = sc.nextInt();
 					
 					if (nodes[numParent] == null && nodes[numChild] == null) { // 둘 다 없는 경우 노드 생성 & 연결
-						nodes[numParent] = new TreeNode(numParent, -1, 1, numChild, -1);
-						nodes[numChild]  = new TreeNode(numChild, numParent, 2, -1, -1);
+						nodes[numParent] = new TreeNode_D5_1248(numParent, -1, 1, numChild, -1);
+						nodes[numChild]  = new TreeNode_D5_1248(numChild, numParent, 2, -1, -1);
 					} else if (nodes[numParent] == null) { // parent만 원래 없었다면 생성 & 연결
-						nodes[numParent] = new TreeNode(numParent, -1, nodes[numChild].level-1, numChild, -1);
+						nodes[numParent] = new TreeNode_D5_1248(numParent, -1, nodes[numChild].level-1, numChild, -1);
 						nodes[numChild].parent = numParent;
 					} else if (nodes[numChild] == null) { // child만 원래 없었다면 생성 & 연결
-						nodes[numChild] = new TreeNode(numChild, numParent, nodes[numParent].level+1, -1, -1);
+						nodes[numChild] = new TreeNode_D5_1248(numChild, numParent, nodes[numParent].level+1, -1, -1);
 						if (nodes[numParent].leftChild == -1)
 							nodes[numParent].leftChild = numChild;
 						else 
@@ -51,8 +51,8 @@ public class D5_1248 {
 				// search for the common ancestor of A and B
 				// 전략 : A, B 중 레벨이 더 높은 (트리에서 더 낮은 곳에 있는) 것을 나머지 것과 level이 동일해질 때까지 순회
 				// 		 만약 순회한 결과가 나머지 것과 다르다면 둘을 동시에 하나씩 level-- 하면서 순회. 루트까지 올라가면서 같아지는 최초의 공통조상 찾기
-				TreeNode needToUp = (nodeA.level > nodeB.level) ? nodeA : nodeB;
-				TreeNode rest = (nodeA.level > nodeB.level) ? nodeB : nodeA;
+				TreeNode_D5_1248 needToUp = (nodeA.level > nodeB.level) ? nodeA : nodeB;
+				TreeNode_D5_1248 rest = (nodeA.level > nodeB.level) ? nodeB : nodeA;
 
 				//System.out.println("#"+t+" needToUp = "+needToUp.num);
 				//System.out.println("#"+t+" rest = "+rest.num);
@@ -70,7 +70,7 @@ public class D5_1248 {
 					needToUp = nodes[needToUp.parent];
 					rest = nodes[rest.parent];
 				}
-				final TreeNode commonAncestor = needToUp;
+				final TreeNode_D5_1248 commonAncestor = needToUp;
 				
 				// commonAncestor를 포함한 그것의 모든 자식의 개수 세기
 				int count = countChildNodes(nodes, commonAncestor);
@@ -80,7 +80,7 @@ public class D5_1248 {
 		}
 	}
 	
-	public static void resetChildLevels(TreeNode[] nodes, TreeNode parent) {
+	public static void resetChildLevels(TreeNode_D5_1248[] nodes, TreeNode_D5_1248 parent) {
 		if (parent == null) return;
 		if (parent.leftChild != -1) {
 			nodes[parent.leftChild].level = parent.level + 1;
@@ -92,7 +92,7 @@ public class D5_1248 {
 		}
 	}
 	
-	public static int countChildNodes(TreeNode[] nodes, TreeNode parent) {
+	public static int countChildNodes(TreeNode_D5_1248[] nodes, TreeNode_D5_1248 parent) {
 		if (parent == null) return 0;
 		int countLeftChildNodes = (parent.leftChild != -1)? countChildNodes(nodes, nodes[parent.leftChild]) : 0;
 		int countRightChildNodes = (parent.rightChild != -1)? countChildNodes(nodes, nodes[parent.rightChild]) : 0;
@@ -101,14 +101,14 @@ public class D5_1248 {
 	}
 }
 
-class TreeNode {
+class TreeNode_D5_1248 {
 	int num = -1;
 	int parent = -1;
 	int level = -1;
 	int leftChild = -1;
 	int rightChild = -1;
 	
-	TreeNode(int num, int parent, int level, int leftChild, int rightChild) {
+	TreeNode_D5_1248(int num, int parent, int level, int leftChild, int rightChild) {
 		this.num = num;
 		this.parent = parent;
 		this.level = level;
