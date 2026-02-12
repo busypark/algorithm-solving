@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 import java.util.Arrays;
 
-// 왜 미리 givenArr를 distinct하게 뽑은 후에 하는 건 안 되고, givenArr 자체를 재귀함수 안에서 'last' 변수를 이용해 continue하는 건 되나?
+// 확인해야 됨
 
 public class S2_15663 {
 	static int N, M;

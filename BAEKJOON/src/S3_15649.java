@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 // https://www.acmicpc.net/workbook/view/2052
-// 전략 : 
 
 public class S3_15649 {
 	public static void main(String[] args) {

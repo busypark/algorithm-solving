@@ -33,7 +33,7 @@ public class G3_17471 {
 		}
 		
 		visited = new boolean[N+1];
-		getMinPopDiff(0, Integer.MAX_VALUE);
+		getMinPopDiff(0, 1);
 		if (minPopulationDiff == Integer.MAX_VALUE) 
 			minPopulationDiff = -1;
 		
@@ -41,38 +41,26 @@ public class G3_17471 {
 	}
 	
 	static boolean[] visited;
-	static boolean pathExistence;
-	static void getMinPopDiff(int count, int currentPopDiff) {
-		if (count == N) { // 모든 구역 다 탐색한 경우 min 갱신 및 종료
-			minPopulationDiff = Math.min(minPopulationDiff, currentPopDiff);
-		} else { // 아직 다 탐색하지 않음
-			for (int i=1; i<=N; i++) {
-				if (!visited[i]) {
-					visited[i] = true;
-					count++;
-					pathVisited = new boolean[N-count];
-					pathExistence = false;
-					
-					
-					visited[i] = false;
-					count--;
-				}
-			}
-		}
+	static boolean pathExistence = false;
+	static void getMinPopDiff(int count, int node) {
+		int[] nodes = edges[node];
+		
+		
 	}
 	
 	static boolean[] pathVisited;
-	static void examinePathExistence(int count) {
+	static void examinePathExistence(int count, int node) {
 		if (count == 0) { // 나머지 지점 모두 탐색한 경우 경로가 존재하는 것이므로 pathExistence = true; 더이상 재귀하지 않아도 됨
 			pathExistence = true;
 		} else { // 아직 덜 탐색
-			if (pathExistence) return;
-			
-			for (int i=0; i<pathVisited.length; i++) {
-				if (!pathVisited[i]) {
-					pathVisited[i] = true;
-					
-					pathVisited[i] = false;
+			int[] nodes = edges[node];
+			for (int i=0; i<nodes.length; i++) {
+				if (pathExistence) return; // 이미 경로 하나라도 발견되었으면 재귀할 필요 없음
+				
+				if (!visited[nodes[i]] && !pathVisited[nodes[i]]) {
+					pathVisited[nodes[i]] = true;
+					examinePathExistence(count-1, nodes[i]);
+					pathVisited[nodes[i]] = false;
 				}
 			}
 		}
