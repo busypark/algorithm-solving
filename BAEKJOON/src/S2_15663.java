@@ -4,8 +4,6 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 import java.util.Arrays;
 
-// 확인해야 됨
-
 public class S2_15663 {
 	static int N, M;
 	static StringBuilder answer = new StringBuilder();
@@ -23,22 +21,14 @@ public class S2_15663 {
 		}
 		Arrays.sort(givenArr);
 		
-		distinctArr = new int[N];
-		distinctArr[0] = givenArr[0];
-		for (int i=0; i<N; i++) {
-			if (1<=i && distinctArr[end] != givenArr[i]) {
-				distinctArr[++end] = givenArr[i];
-			}
-		}
-		
 		answerArr = new int[M];
-		visited = new boolean[end+1];
+		visited = new boolean[N+1];
 		repPermM(0);
 		
 		System.out.println(answer);
 	}
 	
-	static int[] givenArr, distinctArr, answerArr;
+	static int[] givenArr, answerArr;
 	static int end = 0;
 	static boolean[] visited;
 	static void repPermM(int depth) {
@@ -48,7 +38,6 @@ public class S2_15663 {
 			}
 			answer.append("\n");
 		} else {		
-			// 재영님 코드
 			int last = -1;
 			for (int i=0; i<N; i++) {
 				if (last == givenArr[i]) continue;
@@ -56,21 +45,10 @@ public class S2_15663 {
 					visited[i] = true;
 					answerArr[depth] = givenArr[i];
 					last = givenArr[i];
-					repPermM(depth+i);
-					visited[i] = false;
-				}
-			}
-			
-			/* 원래 했던 코드
-			for (int i=0; i<=end; i++) {
-				if (!visited[i]) {
-					visited[i] = true;
-					answerArr[depth] = distinctArr[i];
 					repPermM(depth+1);
 					visited[i] = false;
 				}
 			}
-			*/
 		}
 	}
 }
