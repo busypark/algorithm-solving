@@ -7,17 +7,11 @@ public class S3_1018 {
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static int N, M;
 	static int[][] map;
-	static int[] maskers = new int[2];
 	
 	public static void main(String[] args) throws IOException {
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
-		
-		for (int i=0; i<M/2; i++) {
-			maskers[0] += 1*(int)Math.pow(2, i*2);
-			maskers[1] += 1*(int)Math.pow(2, i*2+1);
-		}
 		
 		// initialize map
 		map = new int[N][M];
@@ -30,33 +24,26 @@ public class S3_1018 {
 			}
 		}
 		
-		minCount = Integer.MAX_VALUE;
-		mapSearch();
-	}
-	
-	static int minCount;
-	static void mapSearch() {
-		
-	}
-	
-	static boolean completeMap() {
-		int s;
-		if (map[0][0] == 0) { // 'B'로 시작
-			s = 0;
-		} else { // 'W'로 시작
-			s = 1;
-		}
-		
-		for (int r=0; r<N; r++) {
-			for (int c=0; c<M; c++) {
-				if ((maskers[s] & (1 << c)) > 0) {
-					
+		// search for the minimum
+		int minCount = Integer.MAX_VALUE;
+		for (int r=0; r<N-8+1; r++) {
+			for (int c=0; c<M-8+1; c++) {
+				// (r, c) : left-top of the window
+				int currCount0 = 0; // left-top : 0
+				int currCount1 = 0; // left-top : 1
+				for (int wr=0; wr<8; wr++) {
+					for (int wc=0; wc<8; wc++) {
+						if (map[r+wr][c+wc] == (wr+wc) % 2) {
+							currCount1++;
+						} else {
+							currCount0++;
+						}
+					}
 				}
+				minCount = Math.min(minCount, Math.min(currCount0, currCount1));
 			}
-			
-			s = 1 - s;
 		}
-	
-		return true;
+		
+		System.out.println(minCount);
 	}
 }
