@@ -250,6 +250,7 @@ public class ReferenceCode {
 				else if (whiteBall_x > targetBall_x && whiteBall_y < targetBall_y) {
 					System.out.println("in2 " +  targetBall_x +" "+ targetBall_y);
 					radian = Math.atan(height / width);
+					
 					//radian = Math.atan2(dy, dx);
 
 					angle = (float) (((180.0 / Math.PI) * radian)+270);
