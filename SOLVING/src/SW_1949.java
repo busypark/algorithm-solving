@@ -2,29 +2,13 @@ import java.io.*;
 import java.util.*;
 
 /*
- * 직관적으로 2차원 배열로 높이값을 저장할 수 있음
- * 최대 깊이 K는 무조건 그만큼 팔 필요가 없음. 어느 한 곳에 1만 파도 되고, 3만 파도 됨
- * 그럼 각 칸에 대해 k=0~K까지 다 파보고 다 들어가봐야 하나? pruning 안 됨?
- * 매번 각 칸을 방문할 때마다 그곳의 십자가 방향으로 '갈 수 있는지'를 계속 검사해야 함
- * 그러지 말고, 0~K에 대해 경우를 미리 뽑아놓으면 굳이 계속 검사 안 해도 되지 않나?
- * 벡터 표현이 마음에 듦. r축/c축을 기준으로 보면 down-right-up-left로 갈 수록 각도가 커짐(0-90-180-270)
- * 너무 차원이 높지 않나? 적어도 3차원 이상인데
- * 어차피 가장 높은 지점들부터 탐색하면 됨
- * 생각보다 탐색 경우의 수가 많지 않을 수 있음. 이미 깎은 등산로는 다음 길보다 무조건 높아서 길을 스스로 막는 효과가 있음
- * 단 한 곳만 깎아야 하므로, 이전에 깎은 적이 있는지 기록해야 하며,
- * 이미 깎이지 않았다면 이번 기회에 '깎은 경우'와 '안 깎은 경우' 모두 경험해야 함
- * 경우가 많지 않을 것 같으니 BFS(Queue)로 처리해보기
- * Queue에 initial points(the highest + k=1~K일 때 the highest) 추가 후 루프
- * initial points는 무조건 k=0인가? 아닐 수도 있음
- * 어느 point에 대해 굳이 0~K를 모두 고려해야 하나? 예를 들어 내가 4인데 주변이 다 1이면..
- * 이 경우 k=0~2까지는 모두 같은 거임
- * 주변 것들이 나보다 모두 크거나 같다? 길 끝
- * 진짜 k 값은 후보 뽑을 때에만 상관있고, 저장할 필요는 없이 '깎았냐 아니냐'만 고려하면 됨
- * 각 루프에서 하려니 머리가 좀 아픔.. 진짜 미리 저장해놓는게 나을듯
- * 2차원 배열 자체를 통으로 list로 만들어보자. 만들 때에 각 2차원 배열의 최대값을 따로, 미리 저장
- * maxHeight 구하는게 맞나?
- * 
- * 소요 시간 : 강의 들으면서 45분 + 
+ * 나보다 이미 낮은 인접칸에 굳이 dig를 할 이유가 있나? 높은 칸에 쓰는게 낫지
+ * 낮은 칸에 써봤자 그 칸의 다음 인접칸들을 줄이는 것과 같음 (최장 경로 찾는 목표에 역행함)
+ * 그리고 어느 한 칸에 쓴다면 자기보다 딱 1칸만 낮아지는 것 이상으로 쓸 이유가 있나?
+ * 자기보다 딱 1칸만 낮아지게 쓰는 걸로 충분함. 그 이상 쓰면 경우를 또 줄이는 거나 마찬가지
+ * 자기 몸에 부딪히는 것도 안 되므로 boolean[][] visited 필요
+ * 이미 dig했는지 여부도 필요하므로 boolean dig 필요
+ * 백트래킹의 매력 : 굳이 모든 걸 다 저장할 필요가 없다. 원래의 흐름이 계속 살아 있으므로 여부만 저장해도 됨
  */
 
 public class SW_1949 {
@@ -34,83 +18,125 @@ public class SW_1949 {
 	
 	static int N, K;
 	static int[][] map;
-	static List<int[][]> kMap;
-	static List<Integer> maxHeights;
 	
 	public static void main(String[] args) throws IOException {
 		st = new StringTokenizer(br.readLine());
 		final int T = Integer.parseInt(st.nextToken());
 		for (int t=1; t<=T; t++) {
-			// input 't'th test case
+			// initialize N, K, map
 			st = new StringTokenizer(br.readLine());
 			N = Integer.parseInt(st.nextToken());
 			K = Integer.parseInt(st.nextToken());
 			
+			int maxHeight = 0;
 			map = new int[N][N];
 			for (int r=0; r<N; r++) {
 				st = new StringTokenizer(br.readLine());
 				for (int c=0; c<N; c++) {
 					map[r][c] = Integer.parseInt(st.nextToken());
+					maxHeight = Math.max(maxHeight, map[r][c]);
 				}
 			}
 			
-			// initialize every counts for k=0 ~ K
-			kMap = new ArrayList<>();
-			maxHeights = new ArrayList<>();
-			initializekMap();
+			// initialize before backtracks
+			maxDist = 0;
 			
-			// 
+			/* initialize curR, curC and backtrack */
+			// 1. k=0 for the max heights
+			for (int r=0; r<N; r++) {
+				for (int c=0; c<N; c++) {
+					if (map[r][c] == maxHeight) {
+						curDist = 0;
+						visited = new boolean[N][N];
+						digged = false;
+						curR = r;
+						curC = c;
+						backtrack();
+					}
+				}
+			}
 			
-			answer.append("#").append(t).append(" ").append("").append("\n");
+			// 2. k>0 for the max heights
+			
+			
+			// print maxDist
+			answer.append("#").append(t).append(" ").append(maxDist).append("\n");
 		}
 		
 		System.out.println(answer);
 	}
 	
-	static void initializekMap() {
-		for (int k=0; k<=K; k++) {
-			int[][] kM = new int[N][N];
-			int maxHeight = 0;
-			for (int r=0; r<N; r++) {
-				for (int c=0; c<N; c++) {
-					int rr, cc;
-					
-					// down
-					rr = r+1;
-					cc = c;
-					if (isValid(rr, cc) && map[rr][cc] < map[r][c] - k) {
-						kM[r][c]++;
-					}
-					
-					// up
-					rr = r-1;
-					cc = c;
-					if (isValid(rr, cc) && map[rr][cc] < map[r][c] - k) {
-						kM[r][c]++;
-					}
-					
-					// right
-					rr = r;
-					cc = c+1;
-					if (isValid(rr, cc) && map[rr][cc] < map[r][c] - k) {
-						kM[r][c]++;
-					}
-
-					// left
-					rr = r;
-					cc = c-1;
-					if (isValid(rr, cc) && map[rr][cc] < map[r][c] - k) {
-						kM[r][c]++;
-					}
-				}
-			}
-			
-			kMap.add(kM);
-			maxHeights.add(maxHeight);
+	static int maxDist, curDist;
+	static boolean[][] visited;
+	static boolean digged;
+	static int curR, curC;
+	static void backtrack() {
+		// how are there many (adjacent) options?
+		int nOptions = 0;
+		// down
+		nOptions += visit(curR+1, curC);
+		// up
+		nOptions += visit(curR-1, curC);
+		// right
+		nOptions += visit(curR, curC+1);
+		// left
+		nOptions += visit(curR, curC-1);
+		
+		// no option -> dead-end (a solution found)
+		if (nOptions == 0) {
+			// process the solution
+			maxDist = Math.max(maxDist, curDist);
 		}
 	}
 	
-	static boolean isValid(int r, int c) {
+	static int visit(int visR, int visC) {
+		visited[curR][curC] = true;
+		
+		int nOptions = 0;
+		if (valid(visR, visC) && !visited[visR][visC]) {
+			nOptions++;
+			if (map[visR][visC] < map[curR][curC]) {
+				// 바로 갈 수 있음
+				curDist++;
+				int tempR = curR;
+				int tempC = curC;
+				curR = visR;
+				curC = visC;
+				
+				backtrack();
+				
+				curC = tempC;
+				curR = tempR;
+				curDist--;
+			} else {
+				// 파야 됨 -> 팔 수 있나? 그리고 K로 충분한가?
+				if (!digged && (map[visR][visC] - (map[curR][curC] - 1)) <= K) {
+					digged = true;
+					int temp = map[visR][visC];
+					map[visR][visC] = map[curR][curC] - 1;
+					curDist++;
+					int tempR = curR;
+					int tempC = curC;
+					curR = visR;
+					curC = visC;
+					
+					backtrack();
+					
+					curC = tempC;
+					curR = tempR;
+					curDist--;
+					map[visR][visC] = temp;
+					digged = false;
+				}
+			}
+		}
+
+		visited[curR][curC] = false;
+		
+		return nOptions;
+	}
+	
+	static boolean valid(int r, int c) {
 		return 0<=r && r<N && 0<=c && c<N;
 	}
 }
