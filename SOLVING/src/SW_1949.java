@@ -9,6 +9,9 @@ import java.util.*;
  * 자기 몸에 부딪히는 것도 안 되므로 boolean[][] visited 필요
  * 이미 dig했는지 여부도 필요하므로 boolean dig 필요
  * 백트래킹의 매력 : 굳이 모든 걸 다 저장할 필요가 없다. 원래의 흐름이 계속 살아 있으므로 여부만 저장해도 됨
+ * maxHeight에 대해 먼저 dig를 할 때에는 해당 칸의 주변보다 1이 작은 것들로 줄일 수 있는지
+ * 그런데 maxHeight를 건드리면 전체의 maxHeight가 변하므로 또다시 조사해야 함..
+ * 
  */
 
 public class SW_1949 {
