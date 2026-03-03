@@ -1,6 +1,9 @@
 import java.io.*;
 import java.util.*;
 
+// https://www.acmicpc.net/problem/16236
+// 260303(화) 명예 A형
+
 public class G3_16236 {
 	static int N;
 	static int rShark, cShark;
