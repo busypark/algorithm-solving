@@ -1,4 +1,5 @@
 // https://www.acmicpc.net/problem/16987
+// 260304(수) 명예 A형
 
 /*
  * 계란 : 내구도, 무게

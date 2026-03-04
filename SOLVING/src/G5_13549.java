@@ -1,4 +1,5 @@
 // https://www.acmicpc.net/problem/13549
+// 260304(수) 명예 A형
 
 import java.io.*;
 import java.util.*;
