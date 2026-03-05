@@ -14,45 +14,45 @@ public class G5_13549 {
 		final int K = Integer.parseInt(st.nextToken());
 		
 		int found = Integer.MAX_VALUE;
+		int[] dist = new int[200001];
 		Set<Integer> discovered = new HashSet<>();
 		Set<Integer> confirmed = new HashSet<>();
-		PriorityQueue<TimeNum> pq = new PriorityQueue<>((tn1, tn2) -> tn1.time - tn2.time);
+		PriorityQueue<Integer> pq = new PriorityQueue<>((tn1, tn2) -> dist[tn1] - dist[tn2]);
 		
 		discovered.add(N);
-		pq.add(new TimeNum(0, N));
+		pq.add(N);
+		dist[N] = 0;
 		while (!pq.isEmpty()) {
-			TimeNum here = pq.poll();
-			if (confirmed.contains(here.num)) {
+			int here = pq.poll();
+			
+			if (confirmed.contains(here)) {
+				if (here == K) {
+					found = dist[here];
+					break;
+				}
 				continue;
 			}
 			
-			if (K <= here.num) {
-				found = Math.min(found, here.time + (here.num - K));
+			if (K <= here) {
+				dist[here] = dist[here] + here - K;
+				confirmed.add(here);
 				continue;
 			}
 			
-			if (found <= here.num) {
-				break;
+			pq.add(here * 2);
+			dist[here * 2] = dist[here];
+			pq.add(here + 1);
+			dist[here + 1] = dist[here] + 1;
+			
+			if (1 <= here) {
+				pq.add(here - 1);
+				dist[here - 1] = dist[here] + 1;
 			}
 			
-			pq.add(new TimeNum(here.time, here.num * 2));
-			pq.add(new TimeNum(here.time + 1, here.num - 1));
-			pq.add(new TimeNum(here.time + 1, here.num + 1));
-			
-			
-			
-			confirmed.add(here.num);
+			confirmed.add(here);
 		}
 		
 		System.out.println(found);
-	}
-}
-
-class TimeNum {
-	int time, num;
-	TimeNum(int time, int num) {
-		this.time = time;
-		this.num = num;
 	}
 }
 

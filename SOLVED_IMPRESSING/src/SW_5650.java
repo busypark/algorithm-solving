@@ -1,5 +1,6 @@
 // https://swexpertacademy.com/main/code/problem/problemDetail.do?contestProbId=AWXRF8s6ezEDFAUo&
 // 런타임 에러 뜸.. 테스트 케이스 다 맞는데
+// 피드백 : br.readline() 바로 parseInt에 넣지 말기! st.nextToken()을 넣기..
 
 import java.io.*;
 import java.util.*;
@@ -13,7 +14,14 @@ public class SW_5650 {
 		final int T = Integer.parseInt(br.readLine());
 		for (int t=1; t<=T; t++) {
 			// input N and map
-			final int N = Integer.parseInt(br.readLine());
+			
+			//String line = br.readLine();
+			//while (line == null || line.trim().isEmpty()) line = br.readLine(); // 빈 줄 건너뛰기
+			//final int N = Integer.parseInt(line.trim());
+			st = new StringTokenizer(br.readLine());
+			int N = Integer.parseInt(st.nextToken());
+			
+			
 			int[][] map = new int[N][N];
 			
 			HashMap<Integer, Coord[]> wormHoles = new HashMap<>(); 
