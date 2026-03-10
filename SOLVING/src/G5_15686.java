@@ -97,7 +97,7 @@ public class G5_15686 {
 	}
 }
 
-class Edge {
+//class Edge {
 	int chickenId, distance;
 	Edge(int chickenId, int distance) {
 		this.chickenId = chickenId;

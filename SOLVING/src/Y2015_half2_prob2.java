@@ -20,7 +20,7 @@ public class Y2015_half2_prob2 {
 	}
 }
 
-class Map {	
+//class Map {	
 	public int N;
 	public int M;
 	public char[][] map;

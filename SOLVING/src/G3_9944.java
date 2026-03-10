@@ -149,7 +149,7 @@ class QStatus {
 	}
 }
 
-class Coord {
+//class Coord {
 	int r, c;
 	Coord(int r, int c) {
 		this.r = r;
