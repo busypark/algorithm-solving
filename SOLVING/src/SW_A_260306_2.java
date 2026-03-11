@@ -1,5 +1,6 @@
 // https://www.acmicpc.net/problem/17472
-// G1_17472 (A형에서는 섬 형태가 직사각형이었으나 원본은 ㄱ, ㄴ 형태도 가능)
+// G1_17472 (A형에서는 섬 형태가 직사각형이었으나 원본은 ㄱ, ㄴ 형태도 가능하므로 더 어려움)
+// Kruskal MST 학습
 
 import java.io.*;
 import java.util.*;
@@ -31,16 +32,17 @@ public class SW_A_260306_2 {
 		final int nIsland = search();
 
 		// construct bridges (initialized as MAX_VALUE while it will be updated as minimum)
-		bridges = new int[nIsland+1][nIsland+1];
+		bridges2 = new int[nIsland+1][nIsland+1];
 		for (int i=1; i<=nIsland; i++) {
-			Arrays.fill(bridges[i], 1, nIsland+1, Integer.MAX_VALUE);
+			Arrays.fill(bridges2[i], 1, nIsland+1, Integer.MAX_VALUE);
 		}
 		constructBridges();
 		
 		
 	}
 	
-	static int[][] bridges;
+	//static int[][] bridges2;
+	
 	static void constructBridges() {
 		// minimum length = 2
 		int islandId = 1;
@@ -71,8 +73,8 @@ public class SW_A_260306_2 {
 						final int dist = shootInfo[1];
 						
 						// update as min distance
-						bridges[targetId][islandId] = Math.min(bridges[targetId][islandId], dist);
-						bridges[islandId][targetId] = Math.min(bridges[islandId][targetId], dist);
+						bridges2[targetId][islandId] = Math.min(bridges2[targetId][islandId], dist);
+						bridges2[islandId][targetId] = Math.min(bridges2[islandId][targetId], dist);
 					}
 				} else {
 					// yet interior -> march
