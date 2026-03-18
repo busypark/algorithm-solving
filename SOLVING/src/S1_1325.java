@@ -1,6 +1,8 @@
 import java.util.*;
 
 public class S1_1325 {
+	static List<Integer>[] edges;
+	
 	public static void main(String[] args) {
 		final Scanner sc = new Scanner(System.in);
 		
@@ -9,7 +11,7 @@ public class S1_1325 {
 		final int M = sc.nextInt();
 		
 		// initialize edges
-		final List<Integer>[] edges = new List[N+1];
+		edges = new List[N+1];
 		for (int i=1; i<=N; i++) {
 			edges[i] = new ArrayList<>();
 		}
@@ -22,40 +24,37 @@ public class S1_1325 {
 			edges[trusted].add(trust);
 		}
 		
-		// bfs with optimal substructure
-		int[] scores = new int[N+1];
-		Map<Integer, List<Integer>> scoreBoard = new HashMap<>();
+		// DP
+		scores = new int[N+1];
+		scoreBoard = new HashMap<>();
 		for (int i=1; i<=N; i++) {
-			boolean[] visited = new boolean[N+1];
-			visited[i] = true;
+			//scores[i] = DP(i);
+			int score = 1;
 			Queue<Integer> q = new LinkedList<>();
 			q.add(i);
-			
-			int curScore = 1; // visited node = i
 			while (!q.isEmpty()) {
-				int here = q.poll();
-				if (scores[here] > 0) {
-					curScore += scores[here] - 1;
+				int node = q.poll();
+				if (scores[node] > 0) {
+					score += scores[node];
 					continue;
 				}
 				
-				for (int edge : edges[i]) {
-					if (!visited[edge]) {
-						visited[edge] = true;
-						curScore ++;
-						q.add(edge);
-					}
+				for (int edge : edges[node]) {
+					int edgeDP = DP(edge);
+					scores[edge] = edgeDP;
+					score += edgeDP;
 				}
 			}
 			
-			scores[i] = curScore;
-			if (!scoreBoard.containsKey(curScore)) {
-				scoreBoard.put(curScore, new ArrayList<>());
+			
+			if (!scoreBoard.containsKey(scores[i])) {
+				scoreBoard.put(scores[i], new ArrayList<>());
 			}
-			scoreBoard.get(curScore).add(i);
+			
+			scoreBoard.get(scores[i]).add(i);
 		}
 		
-		// print
+		// print the maximum nodes
 		List<Integer> keys = new ArrayList<>(scoreBoard.keySet());
 		keys.sort(Collections.reverseOrder());
 		
@@ -67,5 +66,23 @@ public class S1_1325 {
 		}
 		
 		System.out.println();
+	}
+	
+	
+	static int[] scores;
+	static Map<Integer, List<Integer>> scoreBoard;
+	static int DP(int node) {
+		if (scores[node] > 0) {
+			return scores[node];
+		}
+		
+		int sum = 1;
+		for (int edge : edges[node]) {
+			int edgeDP = DP(edge);
+			scores[edge] = edgeDP;
+			sum += edgeDP;
+		}
+		
+		return sum;
 	}
 }
