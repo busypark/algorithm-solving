@@ -1,6 +1,8 @@
 import java.io.*;
 import java.util.*;
 
+// bfs로 푸는 거 맞는데 자꾸 시간초과 뜸. 다른 사람들도 그렇다고 함.. 그냥 문제가 이상한듯
+
 public class S1_1325 {	
 	public static void main(String[] args) throws IOException {
 		final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
