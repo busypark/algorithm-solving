@@ -1,88 +1,64 @@
+import java.io.*;
 import java.util.*;
 
-public class S1_1325 {
-	static List<Integer>[] edges;
-	
-	public static void main(String[] args) {
-		final Scanner sc = new Scanner(System.in);
+public class S1_1325 {	
+	public static void main(String[] args) throws IOException {
+		final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st;
 		
 		// input N and M
-		final int N = sc.nextInt();
-		final int M = sc.nextInt();
+		st = new StringTokenizer(br.readLine());
+		final int N = Integer.parseInt(st.nextToken());
+		final int M = Integer.parseInt(st.nextToken());
 		
 		// initialize edges
-		edges = new List[N+1];
+		List<Integer>[] edges = new List[N+1];
 		for (int i=1; i<=N; i++) {
 			edges[i] = new ArrayList<>();
 		}
 		
-		// add edges into the directed graph
+		// add edges into the directed graph and edge matrix
 		for (int i=0; i<M; i++) {
-			final int trust = sc.nextInt();
-			final int trusted = sc.nextInt();
+			st = new StringTokenizer(br.readLine());
+			final int trust = Integer.parseInt(st.nextToken());
+			final int trusted = Integer.parseInt(st.nextToken());
 			
 			edges[trusted].add(trust);
 		}
 		
-		// DP
-		scores = new int[N+1];
-		scoreBoard = new HashMap<>();
+		// bfs
+		int maxCount = 0;
+		int[] counts = new int[N+1];
+		//List<Integer> maxNodes = new ArrayList<>();
 		for (int i=1; i<=N; i++) {
-			//scores[i] = DP(i);
-			int score = 1;
-			Queue<Integer> q = new LinkedList<>();
+			int count = 1;
+			
+			Queue<Integer> q = new ArrayDeque<>();
 			q.add(i);
+			boolean[] visited = new boolean[N+1];
+			visited[i] = true;
 			while (!q.isEmpty()) {
 				int node = q.poll();
-				if (scores[node] > 0) {
-					score += scores[node];
-					continue;
-				}
-				
 				for (int edge : edges[node]) {
-					int edgeDP = DP(edge);
-					scores[edge] = edgeDP;
-					score += edgeDP;
+					if (!visited[edge]) {
+						visited[edge] = true;
+						count ++;
+						q.add(edge);
+					}
 				}
 			}
 			
-			
-			if (!scoreBoard.containsKey(scores[i])) {
-				scoreBoard.put(scores[i], new ArrayList<>());
-			}
-			
-			scoreBoard.get(scores[i]).add(i);
+			counts[i] = count;
+			maxCount = Math.max(maxCount, count);
 		}
 		
-		// print the maximum nodes
-		List<Integer> keys = new ArrayList<>(scoreBoard.keySet());
-		keys.sort(Collections.reverseOrder());
-		
-		List<Integer> values = scoreBoard.get(keys.get(0));
-		values.sort(null);
-		
-		for (int ele : values) {
-			System.out.print(ele + " ");
+		// print
+		final StringBuilder answer = new StringBuilder();
+		for (int i=1; i<=N; i++) {
+			if (counts[i] == maxCount)
+				answer.append(i).append(" ");
 		}
 		
-		System.out.println();
-	}
-	
-	
-	static int[] scores;
-	static Map<Integer, List<Integer>> scoreBoard;
-	static int DP(int node) {
-		if (scores[node] > 0) {
-			return scores[node];
-		}
-		
-		int sum = 1;
-		for (int edge : edges[node]) {
-			int edgeDP = DP(edge);
-			scores[edge] = edgeDP;
-			sum += edgeDP;
-		}
-		
-		return sum;
+		System.out.println(answer);
 	}
 }
