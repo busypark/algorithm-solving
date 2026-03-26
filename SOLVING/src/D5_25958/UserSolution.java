@@ -80,10 +80,9 @@ class UserSolution {
 		int[] head = {0, -1};
 		
 		int[] lastT = new int[T];
-		//int[] lastM = new int[T];
+		int[] preserveLastT = new int[T];
 		
 		Arrays.fill(lastT, Integer.MIN_VALUE);
-		//Arrays.fill(lastM, -1);
 		
 		Arrays.fill(mRetTs, -1);
 		Arrays.fill(mRetHP, mHP);
@@ -95,13 +94,16 @@ class UserSolution {
 		while (DoE < M) {
 			Arrays.fill(targets, false);
 			Arrays.fill(attackedHP, 0);
+			for (int i=0; i<T; i++)
+				preserveLastT[i] = lastT[i];
+			
 			if (head[1] != -1) {
 				int whom = head[0];
 				for (int where = head[1]; 0 <= where && whom < M; where--) {
-					for (int twr : attackedBy[whom]) {
+					for (int twr : attackedBy[where]) {						
 						if (!targets[twr] && lastT[twr] + reload.get(twr) <= t) {
 							attackedHP[whom] ++;
-							lastT[twr] = t;
+							preserveLastT[twr] = t;
 							targets[twr] = true;
 						}
 					}
@@ -109,6 +111,9 @@ class UserSolution {
 					whom ++;
 				}
 			}
+
+			for (int i=0; i<T; i++)
+				lastT[i] = preserveLastT[i];
 			
 			for (int m=0; m<M; m++) {
 				if (mRetTs[m] == -1) {

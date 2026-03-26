@@ -66,14 +66,20 @@ class Solution {
     			for (int i = 0; i < M; i++)
     			{
     				int x = Integer.parseInt(stdin.nextToken());
-    				if (mRetTs[i] != x)
+    				if (mRetTs[i] != x) {
     					okay = false;
+    					System.out.println((i+1)+"번째 mRetTs");
+    					System.out.println("x="+x+" [i]="+mRetTs[i]);
+    				}
     			}
     			for (int i = 0; i < M; i++)
     			{
     				int x = Integer.parseInt(stdin.nextToken());;
-    				if (mRetHP[i] != x)
+    				if (mRetHP[i] != x) {
     					okay = false;
+    					System.out.println((i+1)+"번째 mRetHP");
+    					System.out.println("x="+x+" [i]="+mRetHP[i]);
+    				}
     			}
     			break;
     		default:
