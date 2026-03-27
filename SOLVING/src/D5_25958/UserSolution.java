@@ -76,7 +76,7 @@ class UserSolution {
 	}
 
 	void runSimulation(int M, int mInterval, int mHP, int mRetTs[], int mRetHP[])
-	{
+	{				
 		int[] head = {0, -1};
 		
 		int[] lastT = new int[T];
@@ -89,8 +89,11 @@ class UserSolution {
 		
 		int t = 0;
 		int DoE = 0;
+		int lastBorn = -1;
 		boolean[] targets = new boolean[T];
 		int[] attackedHP = new int[M];
+		PriorityQueue<Integer> mpq = new PriorityQueue<>((a, b) -> ((mRetHP[a] == mRetHP[b]) ? (a - b) : (mRetHP[a] - mRetHP[b])));
+		PriorityQueue<Integer> subpq = new PriorityQueue<>((a, b) -> ((mRetHP[a] == mRetHP[b]) ? (a - b) : (mRetHP[a] - mRetHP[b])));
 		while (DoE < M) {
 			Arrays.fill(targets, false);
 			Arrays.fill(attackedHP, 0);
@@ -98,16 +101,21 @@ class UserSolution {
 				preserveLastT[i] = lastT[i];
 			
 			if (head[1] != -1) {
-				int whom = head[0];
-				for (int where = head[1]; 0 <= where && whom < M; where--) {
+				//int whom = head[0];
+				//for (int where = head[1]; 0 <= where && whom < M; where--) {
+				while (!mpq.isEmpty()) {
+					int whom = mpq.poll();
+					int where = head[1] - (whom - head[0]);
+					
 					for (int twr : attackedBy[where]) {						
-						if (!targets[twr] && lastT[twr] + reload.get(twr) <= t) {
+						if (mRetTs[whom] == -1 && !targets[twr] && lastT[twr] + reload.get(twr) <= t) {
 							attackedHP[whom] ++;
 							preserveLastT[twr] = t;
 							targets[twr] = true;
 						}
 					}
 					
+					subpq.offer(whom);
 					whom ++;
 				}
 			}
@@ -115,8 +123,10 @@ class UserSolution {
 			for (int i=0; i<T; i++)
 				lastT[i] = preserveLastT[i];
 			
-			for (int m=0; m<M; m++) {
-				if (mRetTs[m] == -1) {
+			//for (int m=0; m<M; m++) {
+			while (!subpq.isEmpty()) {
+				//if (mRetTs[m] == -1) {
+					int m = subpq.poll();
 					int newHP = mRetHP[m] - attackedHP[m];
 					if (newHP <= 0) {
 						mRetHP[m] = 0;
@@ -127,8 +137,16 @@ class UserSolution {
 						DoE ++;
 					} else {
 						mRetHP[m] = newHP;
+						
+						if (0 < t && t % mInterval == 0) {
+							if (head[1] + 1 == P-1 && head[0] == m) {
+								continue;
+							}
+						}
+						
+						mpq.offer(m);
 					}
-				}
+				//}
 			}
 			
 			if (0 < t && t % mInterval == 0) {
@@ -140,17 +158,25 @@ class UserSolution {
 					head[1] --;
 					DoE ++;
 				}
+				
+				if (lastBorn < M-1) {
+					lastBorn ++;
+					mpq.offer(lastBorn);
+				}
 			}
 			
-			System.out.println("------------");
-			print("t", t);
-			print("head", head);
-			print("lastT", lastT);
-			print("DoE", DoE);
-			print("mRetTs", mRetTs);
-			print("mRetHP", mRetHP);
-			print("targets", targets);
-			print("attackedHP", attackedHP);
+			if (t <= 15) {
+			//if (false) {
+				System.out.println("------------");
+				print("t", t);
+				print("head", head);
+				print("lastT", lastT);
+				print("DoE", DoE);
+				print("mRetTs", mRetTs);
+				print("mRetHP", mRetHP);
+				print("targets", targets);
+				print("attackedHP", attackedHP);
+			}
 			
 			t++;
 		}
