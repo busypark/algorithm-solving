@@ -14,7 +14,7 @@ import java.util.*;
  * 
  */
 
-public class SW_1949 {
+public class SW_1949_old_try {
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static StringTokenizer st;
 	static StringBuilder answer = new StringBuilder();

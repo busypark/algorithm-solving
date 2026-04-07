@@ -38,12 +38,14 @@
  * 피드백 : 분명 쉬운 문제였지만 그에 비해 너무 오래 걸렸음.. 남과의 비교에 의해 심리적 긴장이 컸음
  * 예전엔 이런 문제를 보면 설렜는데.. 그런데 두 번째 문제 풀 때에는 좀 더 내려놓은 듯. 강의 들으면서 하니까 긴장이 안 됐음
  * 왜일까? 왜 설렘보다 긴장이 앞섰을까
+ * 
+ * 이거 유니온 파인드 문제라는데... 다시 풀어보기
  */
 
 import java.io.*;
 import java.util.*;
 
-public class G4_1043 {
+public class G4_1043_old {
 	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	static StringTokenizer st;
 	
