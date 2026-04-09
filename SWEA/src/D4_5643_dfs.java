@@ -1,7 +1,10 @@
 import java.io.*;
 import java.util.*;
 
-public class D4_5643 {
+// dfs 접근 자체는 괜찮지만 '한 번에' 다 계산할 수 있을 거라고 착각했음
+// 물론 한 번에 하는 것도 Set으로 가능할수도? 있지만.. 일단 플로이드 워셜부터 시도, 그 다음에 Set으로 한 번에 시도해보기
+
+public class D4_5643_dfs {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st;
@@ -28,21 +31,16 @@ public class D4_5643 {
 				fEdges[a].add(b);
 				bEdges[b].add(a);
 			}
-			
-			int[] fCount = new int[N+1];
-			int[] bCount = new int[N+1];
-			
-			boolean[] visited = new boolean[N+1];
-			countChildren(N, M, fEdges, 1, visited, fCount);
-			Arrays.fill(visited, false);
-			countChildren(N, M, bEdges, 1, visited, bCount);
-			
+
 			int count = 0;
-			for (int i=1; i<=N; i++) {
-				System.out.println(fCount[i] +" "+ bCount[i]);
-				if (fCount[i] + bCount[i] == N-1) {
+			for (int start=1; start<=N; start++) {
+				boolean[] visited = new boolean[N+1];
+				int c1 = countChildren(N, M, fEdges, start, visited);
+				Arrays.fill(visited, false);
+				int c2 = countChildren(N, M, bEdges, start, visited);
+				
+				if (c1 + c2 == N-1)
 					count ++;
-				}
 			}
 			
 			answer.append("#").append(t).append(" ").append(count).append("\n");
@@ -51,14 +49,16 @@ public class D4_5643 {
 		System.out.print(answer);
 	}
 	
-	static void countChildren(int N, int M, List<Integer>[] edges, int p, boolean[] visited, int[] count) {
+	static int countChildren(int N, int M, List<Integer>[] edges, int p, boolean[] visited) {
+		int count = 0;
 		if (!visited[p]) {
 			visited[p] = true;
-			count[p] = edges[p].size();
 			for (int child : edges[p]) {
-				countChildren(N, M, edges, child, visited, count);
-				count[p] += count[child];
+				if (visited[child]) continue;
+				count += 1 + countChildren(N, M, edges, child, visited);
 			}
 		}
+		
+		return count;
 	}
 }
