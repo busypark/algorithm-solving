@@ -5,7 +5,7 @@
 import java.io.*;
 import java.util.*;
  
-public class SW_A_260307_1 {
+public class SW_A_260307_1_SW_1767 {
     static final int[] drArr = {1, -1, 0, 0};
     static final int[] dcArr = {0, 0, 1, -1};
          
