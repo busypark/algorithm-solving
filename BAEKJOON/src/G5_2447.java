@@ -1,7 +1,8 @@
 import java.util.*;
 
 // 복잡해보였는데 재귀함수로 접근해서 잘 푼 듯? 대략 20분 소요
-// 피드백 : 
+// 피드백 : 최종적으로 sc.close();를 하면 메모리 100KB 단위, 시간 10ms 단위로 절약
+// 피드백 : static으로 배열을 빼니까 오히려 메모리가 오르긴 했는데 300KB 정도? 이 정도는 아마 우연 아닐까..
 
 public class G5_2447 {
 	public static void main(String[] args) {
@@ -22,6 +23,7 @@ public class G5_2447 {
 		}
 		
 		System.out.print(answer);
+		sc.close();
 	}
 	
 	static void inverseStamp(boolean[][] inverseGrid, int unit, int rs, int cs) {

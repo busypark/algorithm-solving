@@ -3,7 +3,8 @@ import java.io.*;
 
 // 역순/dfs로 접근해서 15분만에 코드 짰는데 시간초과
 // 한 35분 더 고민하면서 위상정렬로 짰는데 자꾸 미묘하게 안 됐지만 큐에 넣을 조건이 안 되어도 업데이트하도록 바꾸니 작동-통과
-// 피드백 : 
+// 피드백 : 이 정도면 충분히 빠른듯. 입력 스트림 자체를 건드려서 엄청나게 시간/메모리 절약한 코드 있지만, 그런 건 본질적이진 않음
+// 참고 : https://www.acmicpc.net/source/103647342
 
 public class G3_1005 {
 	public static void main(String[] args) throws IOException {
